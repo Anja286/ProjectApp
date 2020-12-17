@@ -1,0 +1,49 @@
+import axios from 'axios';
+import cookie from 'react-cookie';
+
+import config from '../config.js';
+
+const fgtoken = cookie.load('fg-access-token');
+
+let axiosConfig = {
+    headers: {'x-access-token': fgtoken}
+};
+
+
+export function newPerson() {
+
+    const body = { object: {} };
+    let newChild;
+
+    // create a new blank person record for a child
+    return (dispatch) => {
+        dispatch({type: "CREATE_PERSON"});
+        axios.post(config.dispatch + '/api/v2/person/create', body, axiosConfig)
+            .then((response) => {
+                newChild = response.data;
+                dispatch({type: "CREATE_PERSON_FULFILLED", payload: response.data})
+
+                /******* NEW CODE HERE ***********/
+                const birthBody = {
+                    object: {
+                        person_id: newChild.response,
+                        eventType: 'Birth',
+                    }
+                }
+
+                // create a blank birth record for the newly created person because we don't trust people without a birthdate.
+                dispatch({type: "CREATE_EVENT"});
+                axios.post(config.response + '/api/v2/event/create', birthBody, axiosConfig)
+                    .then((response) => {
+                        dispatch({type: "CREATE_EVENT_FULFILLED", payload: response.data})
+                    })
+                    .catch((err) => {
+                        dispatch({type: "CREATE_EVENT_REJECTED", payload: err})
+                    });
+            })
+            .catch((err) => {
+                dispatch({type: "CREATE_PERSON_REJECTED", payload: err})
+            })
+
+    }
+}
