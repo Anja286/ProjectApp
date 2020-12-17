@@ -1,0 +1,35 @@
+export default function reducer(
+    state={
+        people: [],
+        fetching: false,
+        error: null,
+    },
+    action = ""
+) {
+case "CREATE_PERSON": {
+        return {
+            ...state,
+            fetching: true
+        };
+    }
+case "CREATE_PERSON_FULFILLED": {
+        return {
+            ...state,
+            fetching: false,
+            people: [
+                ...state.people,
+                action.payload
+            ]
+        };
+    }
+    //made by Anja
+    
+case "CREATE_PERSON_REJECTED": {
+        return {
+            ...state,
+            fetching: false,
+            error: action.payload
+        };
+    }
+}
+//made by Anja
