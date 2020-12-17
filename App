@@ -1,0 +1,35 @@
+import React from 'react';
+import { connect } from "react-redux"
+import { createPerson } from '../../actions/peopleActions';
+
+@connect(
+    (store) => {
+        return {
+            people: store.people.people,
+        };
+    },
+    (dispatch) => {
+        return {
+            createPerson: () => {
+                dispatch(createPerson());
+            }
+        }
+    }
+)
+export default class PeopleSearch extends React.Component {
+
+    createPerson = () => {
+        this.props.createPerson();
+
+        console.log("After createPerson, with: ", this.props.people);
+    };
+
+    render = () => {
+        return (
+            <div>
+                <button onClick={this.createPerson}>
+                    Create Person
+                </button>
+            </div>);
+    }
+}
